@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <WarningLevel>5</WarningLevel>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Error.fs" />
+    <Compile Include="Exceptions\VkException.fs" />
+    <Compile Include="UploadedFileInfo.fs" />
+    <Compile Include="UploadServer.fs" />
+    <Compile Include="Wrappers.fs" />
+    <Compile Include="Requests.fs" />
+    <Compile Include="AuthInfo.fs" />
+    <Compile Include="Document.fs" />
+    <Compile Include="Client.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Json" Version="0.4.0" />
+    <PackageReference Include="TaskBuilder.fs" Version="2.1.0" />
+  </ItemGroup>
+
+</Project>
