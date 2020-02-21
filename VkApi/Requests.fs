@@ -1,4 +1,4 @@
-﻿namespace VkApi
+﻿namespace VkApi.Core
 
 module internal Requests =
 
@@ -7,21 +7,22 @@ module internal Requests =
     open System.IO
     open System.Net
     open FSharp.Control.Tasks.V2
-    open FSharp.Json
+    open Newtonsoft.Json
+    open VkApi
     open VkApi.Exceptions
 
 
     let private tryConvert<'T> content =
         let (?) (content: string) =
             if content.Contains "error" = true then
-                let error = content |> Json.deserialize<Error>
+                let error = content |> JsonConvert.DeserializeObject<Error>
                 Error error.InnerError
             else
                 Ok content
            
         match (?) content with
         | Error error -> raise <| new VkException (error)
-        | Ok response -> response |> Json.deserialize<'T>
+        | Ok response -> response |> JsonConvert.DeserializeObject<'T>
 
     let makeGetRequest<'T> (url: string) =
         task {

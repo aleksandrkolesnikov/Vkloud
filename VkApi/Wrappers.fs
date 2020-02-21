@@ -1,22 +1,22 @@
 ﻿namespace VkApi.Wrappers
 
-open FSharp.Json
+open Newtonsoft.Json
 
 
-type Response<'T> = {
+type Response<'T> =
+    {
+        [<JsonProperty "response">]
+        Response: 'T
+    }
 
-    [<JsonField("response")>]
-    Response: 'T
-}
+type Collection<'T> =
+    {
+        [<JsonProperty "items">]
+        Items: 'T list
+    }
 
-type Collection<'T> = {
-    
-    [<JsonField("items")>]
-    Items: 'T list
-}
-
-type Doc<'T> = {
-
-    [<JsonField("doc")>]
-    Document: 'T
-}
+type Doc<'T> =
+    {
+        [<JsonProperty "doc">]
+        Document: 'T
+    }

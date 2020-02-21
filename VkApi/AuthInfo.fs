@@ -1,15 +1,14 @@
 ﻿namespace VkApi
 
-open FSharp.Json
+open Newtonsoft.Json
 
 
-type AuthInfo = {
+type AuthInfo =
+    {
+        [<JsonProperty "access_token">]
+        AccessToken: string
 
-    [<JsonField("access_token")>]
-    AccessToken: string
-
-    [<JsonField("user_id")>]
-    UserId: uint64
-
-}
+        [<JsonProperty "user_id">]
+        UserId: uint64
+    }
 

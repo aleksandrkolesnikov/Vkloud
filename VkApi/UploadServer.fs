@@ -1,10 +1,10 @@
 ﻿namespace VkApi
 
-open FSharp.Json
+open Newtonsoft.Json
 
 
-type UploadServer = {
-
-    [<JsonField("upload_url")>]
-    Url: string
-}
+type UploadServer =
+    {
+        [<JsonProperty "upload_url">]
+        Url: string
+    }

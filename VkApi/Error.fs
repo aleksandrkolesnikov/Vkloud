@@ -1,19 +1,18 @@
 ﻿namespace VkApi
 
-open FSharp.Json
+open Newtonsoft.Json
 
 
-type Error = {
-
-    [<JsonField("error")>]
-    InnerError: InnerError
-}
-and
-    InnerError = {
-
-        [<JsonField("error_code")>]
+type Error =
+    {
+        [<JsonProperty "error">]
+        InnerError: InnerError
+    }
+and InnerError =
+    {
+        [<JsonProperty "error_code">]
         Code: int
 
-        [<JsonField("error_msg")>]
+        [<JsonProperty "error_msg">]
         Message: string
     }

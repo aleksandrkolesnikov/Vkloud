@@ -1,22 +1,22 @@
 ﻿namespace VkApi
 
-open FSharp.Json
+open Newtonsoft.Json
 
 
-type Document = {
-    
-    [<JsonField("id")>]
-    Id: uint64
+type Document =
+    {
+        [<JsonProperty "id">]
+        Id: uint64
 
-    [<JsonField("owner_id")>]
-    OwnerId: uint64
+        [<JsonProperty "owner_id">]
+        OwnerId: uint64
 
-    [<JsonField("title")>]
-    Title: string
+        [<JsonProperty "title">]
+        Title: string
 
-    [<JsonField("size")>]
-    Size: uint64
+        [<JsonProperty "size">]
+        Size: uint64
 
-    [<JsonField("date")>]
-    Date: uint64
-}
+        [<JsonProperty "date">]
+        Date: uint64
+    }

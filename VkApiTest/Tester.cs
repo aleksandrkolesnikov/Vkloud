@@ -1,10 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using VkApi;
-
+using VkApi.Exceptions;
 
 namespace VkApiTest
 {
@@ -64,29 +65,25 @@ namespace VkApiTest
 
         }
 
-        [Fact(DisplayName = "Many Requests to API")]
+        [Fact(DisplayName = "To Many Requests Per Seconds")]
         public void MakeManyRequests()
         {
-            var client = VkClient.Get;
+            void TestAction()
+            {
+                var client = VkClient.Get;
+                var tasks = new List<Task<Microsoft.FSharp.Collections.FSharpList<Document>>>();
 
-            try
-            {
-                var docs = client.GetDocuments().Result;
-                var docs1 = client.GetDocuments().Result;
-                var docs2 = client.GetDocuments().Result;
-                var docs3 = client.GetDocuments().Result;
-                var docs5 = client.GetDocuments().Result;
-                var docs6 = client.GetDocuments().Result;
-                var docs7 = client.GetDocuments().Result;
-                var docs8 = client.GetDocuments().Result;
-                var docs9 = client.GetDocuments().Result;
-                var docs10 = client.GetDocuments().Result;
-                var docs11 = client.GetDocuments().Result;
-                var docs12 = client.GetDocuments().Result;
+                for (int i = 0; i < 80; ++i)
+                {
+                    var docs = client.GetDocuments();
+                    tasks.Add(docs);
+                }
+
+                Task.WaitAll(tasks.ToArray());
             }
-            catch (VkApi.Exceptions.VkException ex)
-            {
-            }
+
+            var ex = Assert.Throws<AggregateException>(TestAction);
+            Assert.Equal("Too many requests per second", ex.InnerException.Message);
         }
     }
 }

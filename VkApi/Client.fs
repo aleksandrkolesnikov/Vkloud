@@ -1,6 +1,7 @@
 ﻿namespace VkApi
 
 open VkApi.Wrappers
+open VkApi.Core
 open FSharp.Control.Tasks.V2
 
 
