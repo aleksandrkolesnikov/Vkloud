@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using VkApi;
-using VkApi.Exceptions;
+
 
 namespace VkApiTest
 {
@@ -71,7 +71,7 @@ namespace VkApiTest
             void TestAction()
             {
                 var client = VkClient.Get;
-                var tasks = new List<Task<Microsoft.FSharp.Collections.FSharpList<Document>>>();
+                var tasks = new List<Task<List<Document>>>();
 
                 for (int i = 0; i < 80; ++i)
                 {

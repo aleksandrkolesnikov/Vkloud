@@ -1,5 +1,6 @@
 ﻿namespace VkApi.Wrappers
 
+open System.Collections.Generic
 open Newtonsoft.Json
 
 
@@ -9,10 +10,11 @@ type Response<'T> =
         Response: 'T
     }
 
+[<NoComparison>]
 type Collection<'T> =
     {
         [<JsonProperty "items">]
-        Items: 'T list
+        Items: List<'T>
     }
 
 type Doc<'T> =
