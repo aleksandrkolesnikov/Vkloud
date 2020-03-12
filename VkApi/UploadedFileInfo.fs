@@ -3,10 +3,12 @@
 open Newtonsoft.Json
 
 
-type UplodedFileInfo =
-    {
-        [<JsonProperty "file">]
-        Info: string
-    }
-    with
+type internal UplodedFileInfo =
+    struct
+        val Info: string
+
+        [<JsonConstructor>]
+        new file = { Info = file }
+
         member self.Title = self.Info.Split("|").[7]
+    end

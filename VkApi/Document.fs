@@ -1,22 +1,27 @@
 ﻿namespace VkApi
 
+open System
 open Newtonsoft.Json
 
 
 type Document =
-    {
-        [<JsonProperty "id">]
-        Id: uint64
+    struct
+        val Id: uint64
+        val OwnerId: uint64
+        val Title: string
+        val Size: uint64
+        val private UnixDate: uint64
 
-        [<JsonProperty "owner_id">]
-        OwnerId: uint64
+        [<JsonConstructor>]
+        new (id, owner_id, title, size, date) = {
+            Id = id
+            OwnerId = owner_id
+            Title = title
+            Size = size
+            UnixDate = date
+        }
 
-        [<JsonProperty "title">]
-        Title: string
-
-        [<JsonProperty "size">]
-        Size: uint64
-
-        [<JsonProperty "date">]
-        Date: uint64
-    }
+        member self.Date =
+            let unixEpoch = DateTime (1970, 1, 1, 0, 0, 0, 0)
+            self.UnixDate |> float |> unixEpoch.AddSeconds
+    end

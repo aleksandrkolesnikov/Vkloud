@@ -3,12 +3,15 @@
 open Newtonsoft.Json
 
 
-type AuthInfo =
-    {
-        [<JsonProperty "access_token">]
-        AccessToken: string
+type internal AuthInfo =
+    struct
+        val AccessToken: string
+        val UserId: uint64
 
-        [<JsonProperty "user_id">]
-        UserId: uint64
-    }
+        [<JsonConstructor>]
+        new (access_token, user_id) = {
+            AccessToken = access_token
+            UserId = user_id
+        }
+    end
 

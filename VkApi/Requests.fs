@@ -9,35 +9,16 @@ module internal Requests =
     open System.IO
     open System.Net
     open FSharp.Control.Tasks.V2
-    open Newtonsoft.Json
-    open VkApi
-    open VkApi.Exceptions
+    open VkApi.Core.Extensions
 
 
-    let private TryConvert<'T> content =
-        let (?) (content: string) =
-            if content.Contains "error" = true then
-                let error = content |> JsonConvert.DeserializeObject<Error>
-                Error error.InnerError
-            else
-                Ok content
-           
-        match (?) content with
-        | Error error -> raise <| new VkException (error)
-        | Ok response -> response |> JsonConvert.DeserializeObject<'T>
-
-    let AsyncGet<'T> (url: string) =
+    let AsyncGet (url: string) =
         task {
             let httpRequest = WebRequest.CreateHttp url
-            use! response = httpRequest.GetResponseAsync ()
-            use stream = response.GetResponseStream ()
-            use reader = new StreamReader (stream)
-            let! content = reader.ReadToEndAsync ()
-
-            return TryConvert<'T> content
+            return! httpRequest.AsyncGetResponse ()
         }
 
-    let AsyncPost<'T> (url: string) filePath =
+    let AsyncPost (url: string) filePath =
         let boundary = Guid.NewGuid () |> string
 
         let RequestBody filePath =
@@ -85,10 +66,6 @@ module internal Requests =
             use stream = httpRequest.GetRequestStream ()
             let! body = RequestBody filePath
             do! stream.WriteAsync (body, 0, body.Length)
-            let! response = httpRequest.GetResponseAsync ()
-            use stream = response.GetResponseStream ()
-            use reader = new StreamReader (stream)
-            let! content = reader.ReadToEndAsync ()
-    
-            return TryConvert<'T> content
+
+            return! httpRequest.AsyncGetResponse ()
         }

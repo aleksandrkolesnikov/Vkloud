@@ -3,8 +3,10 @@
 open Newtonsoft.Json
 
 
-type UploadServer =
-    {
-        [<JsonProperty "upload_url">]
-        Url: string
-    }
+type internal UploadServer =
+    struct
+        val Url: string
+
+        [<JsonConstructor>]
+        new upload_url = { Url = upload_url }
+    end

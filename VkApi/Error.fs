@@ -3,16 +3,21 @@
 open Newtonsoft.Json
 
 
-type Error =
-    {
-        [<JsonProperty "error">]
-        InnerError: InnerError
-    }
-and InnerError =
-    {
-        [<JsonProperty "error_code">]
-        Code: int
+type internal Error =
+    struct
+        val InnerError: InnerError
 
-        [<JsonProperty "error_msg">]
-        Message: string
-    }
+        [<JsonConstructor>]
+        new error = { InnerError = error }
+    end
+and InnerError =
+    struct
+        val Code: int
+        val Message: string
+
+        [<JsonConstructor>]
+        new (error_code, error_msg) = {
+            Code = error_code
+            Message = error_msg
+        }
+    end

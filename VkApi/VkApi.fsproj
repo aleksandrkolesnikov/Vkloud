@@ -6,15 +6,17 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>5</WarningLevel>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Error.fs" />
-    <Compile Include="Exceptions\VkException.fs" />
+    <Compile Include="Extensions.fs" />
     <Compile Include="Requests.fs" />
+    <Compile Include="Error.fs" />
+    <Compile Include="VkException.fs" />
+    <Compile Include="Wrappers.fs" />
     <Compile Include="UploadedFileInfo.fs" />
     <Compile Include="UploadServer.fs" />
-    <Compile Include="Wrappers.fs" />
     <Compile Include="AuthInfo.fs" />
     <Compile Include="Document.fs" />
     <Compile Include="Client.fs" />

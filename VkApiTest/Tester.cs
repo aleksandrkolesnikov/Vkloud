@@ -83,6 +83,7 @@ namespace VkApiTest
             }
 
             var ex = Assert.Throws<AggregateException>(TestAction);
+            Assert.Equal(typeof(VkException), ex.InnerException.GetType());
             Assert.Equal("Too many requests per second", ex.InnerException.Message);
         }
     }
