@@ -10,5 +10,5 @@ type internal UplodedFileInfo =
         [<JsonConstructor>]
         new file = { Info = file }
 
-        member self.Title = self.Info.Split("|").[7]
+        member self.Title = self.Info.Split('|').[7]
     end

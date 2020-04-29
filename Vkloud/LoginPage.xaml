@@ -1,0 +1,28 @@
+﻿<Page
+    x:Class="Vkloud.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Vkloud"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <StackPanel VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                Width="250">
+        <TextBox PlaceholderText="Login"
+                 Margin="0, 0, 0, 10"
+                 IsSpellCheckEnabled="False"
+                 x:Name="LoginField" />
+
+        <PasswordBox PlaceholderText="Password"
+                     Margin="0, 0, 0, 15"
+                     x:Name="PasswordField" />
+
+        <Button Content="Ok"
+                HorizontalAlignment="Stretch"
+                MaxWidth="80"
+                Click="Button_Click"/>
+    </StackPanel>
+</Page>

@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <WarningLevel>5</WarningLevel>
     <DefineConstants>TRACE</DefineConstants>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="SaveDocument.vks" />
+    <Compile Include="Exceptions.fs" />
     <Compile Include="Extensions.fs" />
     <Compile Include="Requests.fs" />
     <Compile Include="Error.fs" />
-    <Compile Include="VkException.fs" />
     <Compile Include="Wrappers.fs" />
     <Compile Include="UploadedFileInfo.fs" />
     <Compile Include="UploadServer.fs" />
@@ -21,6 +23,8 @@
     <Compile Include="Document.fs" />
     <Compile Include="Client.fs" />
   </ItemGroup>
+
+  <ItemGroup />
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

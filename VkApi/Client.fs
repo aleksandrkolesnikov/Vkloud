@@ -14,17 +14,20 @@ module private Parser =
         function
         | Error json ->
             let error = JsonConvert.DeserializeObject<Error> json
-            raise <| new VkException (error.InnerError)
+            match error.InnerError.Code with
+            | 6 -> raise <| new TooManyRequestsPerSecond (error.InnerError.Message)
+            | _ -> raise <| new System.Exception ("Unknown exception")
         | Ok json -> JsonConvert.DeserializeObject<'T> json
 
 
+[<Sealed>]
 type Client (login, password) =
     let apiVersion = "5.103"
-    let clientId = 3697615
-    let clientSecret = "AlVXZFMUqyrnABp8ncuU"
-    let url = sprintf "https://oauth.vk.com/token?grant_type=password&client_id=%i&client_secret=%s&username=%s&password=%s" clientId clientSecret login password
 
     let authInfo = task {
+            let clientId = 3697615
+            let clientSecret = "AlVXZFMUqyrnABp8ncuU"
+            let url = sprintf "https://oauth.vk.com/token?grant_type=password&client_id=%i&client_secret=%s&username=%s&password=%s" clientId clientSecret login password
             let! response = Requests.AsyncGet url
 
             return Parser.TryParse<AuthInfo> response
@@ -73,6 +76,7 @@ type Client (login, password) =
             let! info = authInfo
             let! uploadServer = AsyncGetUploadServer info
             let! uploadedFile = AsyncUploadDocument filePath uploadServer
+
             return! AsyncSaveDocument info uploadedFile
         }
 
