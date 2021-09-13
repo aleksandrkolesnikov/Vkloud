@@ -13,7 +13,6 @@ namespace Vkloud
         {
             Document = doc;
             Path = doc.Title.Replace(':', System.IO.Path.DirectorySeparatorChar);
-            hash = new(() => base.Hash);
         }
 
         public Document Document { get; }
@@ -31,8 +30,6 @@ namespace Vkloud
             return stream;
         }
 
-        public override byte[] Hash => Document.Hash ?? hash.Value;
-
-        private readonly Lazy<byte[]> hash;
+        public override byte[] Hash => Document.Hash ?? base.Hash;
     }
 }

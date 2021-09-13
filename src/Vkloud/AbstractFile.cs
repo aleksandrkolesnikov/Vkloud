@@ -16,9 +16,7 @@ namespace Vkloud
             {
                 if (Path == file.Path)
                 {
-                    var hash = file.Hash;
-
-                    return hash.SequenceEqual(Hash);
+                    return Hash.SequenceEqual(file.Hash);
                 }
 
                 return false;
@@ -29,19 +27,26 @@ namespace Vkloud
 
         public override int GetHashCode()
         {
-            return 0;
-            //return Convert.ToHexString(Hash).GetHashCode();
+            //return 0;
+            return Convert.ToHexString(Hash).GetHashCode();
         }
 
         public virtual byte[] Hash
         {
             get
             {
-                using var md5 = MD5.Create();
-                using var content = GetContentAsync().Result;
+                if (hash == null)
+                {
+                    using var md5 = MD5.Create();
+                    using var content = GetContentAsync().Result;
 
-                return md5.ComputeHash(content);
+                    hash = md5.ComputeHash(content);
+                }
+
+                return hash;
             }
         }
+
+        private byte[] hash;
     }
 }

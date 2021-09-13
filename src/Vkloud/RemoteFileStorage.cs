@@ -56,18 +56,12 @@ namespace Vkloud
 
             var t = files.First(file => file.Path == f.Path && file.Hash.SequenceEqual(f.Hash));
             await vkClient.RemoveDocumentAsync(t.Document);
+            files.RemoveWhere(file => file.Path == f.Path && file.Hash.SequenceEqual(f.Hash));
 
             Trace.WriteLine($"{t.Document.Title} has been removed");
-
-            // Propably use Dictionary<StorageItem, Document>
-
-            //return Task.CompletedTask;
-
-            //vkClient.RemoveDocumentAsync((t.Value as RemoteFile).Document);
         }
 
         private readonly Client vkClient;
-        //private LinkedList<RemoteFile> files;
         private readonly HashSet<RemoteFile> files;
     }
 }

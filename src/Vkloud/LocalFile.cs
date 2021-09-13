@@ -18,19 +18,6 @@ namespace Vkloud
             return Task.FromResult<Stream>(stream);
         }
 
-        /*protected override byte[] Hash
-        {
-            get
-            {
-                if (hash == null)
-                {
-                    hash = base.Hash;
-                }
-
-                return hash;
-            }
-        }*/
-
         private readonly string fullName;
     }
 }
