@@ -57,7 +57,7 @@ namespace Vkloud
 
         public bool Contains(StorageItem item)
         {
-            throw new NotImplementedException();
+            return container.Files.Contains(item);
         }
 
         public Task Remove(StorageItem item)

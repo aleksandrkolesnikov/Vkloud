@@ -20,14 +20,16 @@ namespace Vkloud
         {
             vkClient = new(login, password);
             var documents = vkClient.GetDocumentsAsync().Result;
-            files = new(documents.Select(document => new RemoteFile(document)));
+            files = new(documents
+                        .Select(doc => new RemoteFile(doc))
+                        .Select(file => new KeyValuePair<string, RemoteFile>(file.Path, file)));
 
             Trace.WriteLine($"RemoteStorage has {files.Count} files");
         }
 
         public IEnumerable<StorageItem> Items
         {
-            get => files;
+            get => files.Values;
         }
 
         public async Task Add(StorageItem item)
@@ -36,8 +38,8 @@ namespace Vkloud
             {
                 using var content = await file.GetContentAsync();
                 var document = await vkClient.UploadDocumentAsync(file.Path.Replace(System.IO.Path.DirectorySeparatorChar, ':'), content);
-                files.Add(new RemoteFile(document));
-                //files.AddLast(new RemoteFile(document));
+                var remoteFile = new RemoteFile(document);
+                files[remoteFile.Path] = remoteFile;
 
                 Trace.WriteLine($"{document.Title} has been uploaded");
             }
@@ -47,21 +49,33 @@ namespace Vkloud
 
         public bool Contains(StorageItem item)
         {
-            return files.Contains(item);
+            if (item is AbstractFile file)
+            {
+                if (files.TryGetValue(file.Path, out var targetFile))
+                {
+                    return file.Equals(targetFile);
+                }
+            }
+
+            return false;
         }
 
         public async Task Remove(StorageItem item)
         {
-            var f = item as AbstractFile;
-
-            var t = files.First(file => file.Path == f.Path && file.Hash.SequenceEqual(f.Hash));
-            await vkClient.RemoveDocumentAsync(t.Document);
-            files.RemoveWhere(file => file.Path == f.Path && file.Hash.SequenceEqual(f.Hash));
-
-            Trace.WriteLine($"{t.Document.Title} has been removed");
+            if (item is AbstractFile file)
+            {
+                if (files.TryGetValue(file.Path, out var targetFile))
+                {
+                    if (file.Equals(targetFile))
+                    {
+                        await vkClient.RemoveDocumentAsync(targetFile.Document);
+                        files.Remove(targetFile.Path);
+                    }
+                }
+            }
         }
 
         private readonly Client vkClient;
-        private readonly HashSet<RemoteFile> files;
+        private readonly Dictionary<string, RemoteFile> files;
     }
 }
