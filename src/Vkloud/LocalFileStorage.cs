@@ -31,6 +31,8 @@ namespace Vkloud
                                 {
                                     Path = fileInfo.FullName.Replace(baseDirInfo.FullName + Path.DirectorySeparatorChar, "")
                                 }));
+
+            files = new();
         }
 
         public IEnumerable<StorageItem> Items => container.Files;
@@ -42,16 +44,11 @@ namespace Vkloud
                 var subDirInfo = Directory.CreateDirectory(Path.Join(baseDirInfo.FullName, Path.GetDirectoryName(file.Path)));
                 var fullFileName = Path.Join(subDirInfo.FullName, Path.GetFileName(file.Path));
 
-                using (var fileStream = File.OpenWrite(fullFileName))
-                using (var content = await file.GetContentAsync())
-                {
-                    await content.CopyToAsync(fileStream);
-                }
+                File.Create(fullFileName).Close();
+                var _file = new BarelyLocalFile(file, fullFileName);
+                files[_file.Path] = _file;
 
-                var localFile = new LocalFile(fullFileName) { Path = fullFileName.Replace(baseDirInfo.FullName + Path.DirectorySeparatorChar, "") };
-                container.Add(localFile);
-
-                Trace.WriteLine($"{file.Path} has been added");
+                //Trace.WriteLine($"{file.Path} has been added");
             }
         }
 
@@ -74,12 +71,15 @@ namespace Vkloud
         {
             if (IsFile(e.FullPath))
             {
+                //TODO: add new file to container
                 Added?.Invoke(this, new StorageEventArgs(this, new LocalFile(e.FullPath) { Path = e.Name }));
             }
         }
 
         private void OnDeleted(object sender, FileSystemEventArgs e)
         {
+            //TODO: deleting folder does not support
+
             var fake = container.CreateFake(e.FullPath.Replace(baseDirInfo.FullName + Path.DirectorySeparatorChar, ""));
             Removed?.Invoke(this, new StorageEventArgs(this, fake));
         }
@@ -89,5 +89,6 @@ namespace Vkloud
         private readonly DirectoryInfo baseDirInfo;
         private readonly FileSystemWatcher watcher;
         private readonly LocalFileContainer container;
+        private readonly Dictionary<string, AbstractFile> files;
     }
 }
