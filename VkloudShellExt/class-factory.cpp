@@ -1,12 +1,11 @@
-#include "pch.h"
 #include "class-factory.h"
+#include "pch.h"
 #include "vkloud-menu-ext.h"
-
 
 extern long g_dllRefCounter;
 
 ClassFactory::ClassFactory()
-    : refCounter{ 1 }
+    : refCounter{1}
 {
     InterlockedIncrement(&g_dllRefCounter);
 }

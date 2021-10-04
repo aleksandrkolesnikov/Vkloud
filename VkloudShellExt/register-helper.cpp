@@ -1,7 +1,6 @@
-#include "pch.h"
 #include "register-helper.h"
+#include "pch.h"
 #include <strsafe.h>
-
 
 namespace utils
 {
@@ -11,9 +10,10 @@ HRESULT SetHKCRRegistryKeyAndValue(PCWSTR subKey, PCWSTR valueName, PCWSTR data)
     HRESULT result;
     HKEY hKey = nullptr;
 
-    // Creates the specified registry key. If the key already exists, the 
-    // function opens it. 
-    result = HRESULT_FROM_WIN32(RegCreateKeyEx(HKEY_CLASSES_ROOT, subKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL));
+    // Creates the specified registry key. If the key already exists, the
+    // function opens it.
+    result = HRESULT_FROM_WIN32(
+        RegCreateKeyEx(HKEY_CLASSES_ROOT, subKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hKey, NULL));
 
     if (SUCCEEDED(result))
     {
@@ -21,7 +21,8 @@ HRESULT SetHKCRRegistryKeyAndValue(PCWSTR subKey, PCWSTR valueName, PCWSTR data)
         {
             // Set the specified value of the key.
             DWORD cbData = lstrlen(data) * sizeof(*data);
-            result = HRESULT_FROM_WIN32(RegSetValueEx(hKey, valueName, 0, REG_SZ, reinterpret_cast<const BYTE*>(data), cbData));
+            result = HRESULT_FROM_WIN32(
+                RegSetValueEx(hKey, valueName, 0, REG_SZ, reinterpret_cast<const BYTE*>(data), cbData));
         }
 
         RegCloseKey(hKey);
@@ -35,13 +36,14 @@ HRESULT GetHKCRRegistryKeyAndValue(PCWSTR subKey, PCWSTR valueName, PWSTR data, 
     HRESULT result;
     HKEY hKey = nullptr;
 
-    // Try to open the specified registry key. 
+    // Try to open the specified registry key.
     result = HRESULT_FROM_WIN32(RegOpenKeyEx(HKEY_CLASSES_ROOT, subKey, 0, KEY_READ, &hKey));
 
     if (SUCCEEDED(result))
     {
         // Get the data for the specified value name.
-        result = HRESULT_FROM_WIN32(RegQueryValueEx(hKey, valueName, NULL, NULL, reinterpret_cast<LPBYTE>(data), &cbData));
+        result =
+            HRESULT_FROM_WIN32(RegQueryValueEx(hKey, valueName, NULL, NULL, reinterpret_cast<LPBYTE>(data), &cbData));
 
         RegCloseKey(hKey);
     }
@@ -75,7 +77,7 @@ HRESULT RegisterInprocServer(PCWSTR module, const CLSID& id, PCWSTR friendlyName
             result = StringCchPrintf(szSubkey, ARRAYSIZE(szSubkey), L"CLSID\\%s\\InprocServer32", szCLSID);
             if (SUCCEEDED(result))
             {
-                // Set the default value of the InprocServer32 key to the 
+                // Set the default value of the InprocServer32 key to the
                 // path of the COM module.
                 result = SetHKCRRegistryKeyAndValue(szSubkey, NULL, module);
                 if (SUCCEEDED(result))
@@ -123,16 +125,15 @@ HRESULT RegisterShellExtContextMenuHandler(PCWSTR fileType, const CLSID& id, PCW
 
     wchar_t szSubkey[MAX_PATH];
 
-    // If pszFileType starts with '.', try to read the default value of the 
-    // HKCR\<File Type> key which contains the ProgID to which the file type 
+    // If pszFileType starts with '.', try to read the default value of the
+    // HKCR\<File Type> key which contains the ProgID to which the file type
     // is linked.
     if (*fileType == L'.')
     {
         wchar_t szDefaultVal[260];
-        result = GetHKCRRegistryKeyAndValue(fileType, NULL, szDefaultVal,
-            sizeof(szDefaultVal));
+        result = GetHKCRRegistryKeyAndValue(fileType, NULL, szDefaultVal, sizeof(szDefaultVal));
 
-        // If the key exists and its default value is not empty, use the 
+        // If the key exists and its default value is not empty, use the
         // ProgID as the file type.
         if (SUCCEEDED(result) && szDefaultVal[0] != L'\0')
         {
@@ -165,15 +166,15 @@ HRESULT UnregisterShellExtContextMenuHandler(PCWSTR fileType, const CLSID& id)
 
     wchar_t szSubkey[MAX_PATH];
 
-    // If pszFileType starts with '.', try to read the default value of the 
-    // HKCR\<File Type> key which contains the ProgID to which the file type 
+    // If pszFileType starts with '.', try to read the default value of the
+    // HKCR\<File Type> key which contains the ProgID to which the file type
     // is linked.
     if (*fileType == L'.')
     {
         wchar_t szDefaultVal[260];
         result = GetHKCRRegistryKeyAndValue(fileType, NULL, szDefaultVal, sizeof(szDefaultVal));
 
-        // If the key exists and its default value is not empty, use the 
+        // If the key exists and its default value is not empty, use the
         // ProgID as the file type.
         if (SUCCEEDED(result) && szDefaultVal[0] != L'\0')
         {
@@ -191,4 +192,4 @@ HRESULT UnregisterShellExtContextMenuHandler(PCWSTR fileType, const CLSID& id)
     return result;
 }
 
-}
+} // namespace utils

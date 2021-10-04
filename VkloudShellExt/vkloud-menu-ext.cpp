@@ -1,14 +1,13 @@
-#include "pch.h"
 #include "vkloud-menu-ext.h"
+#include "pch.h"
 //#include <Shlwapi.h>
 //#include <strsafe.h>
-
 
 #define IDM_DISPLAY 0
 
 VkloudMenuExtention::VkloudMenuExtention()
-    : refCounter{ 1 }
-    , menuText{ L"Test menu" }
+    : refCounter{1}
+    , menuText{L"Test menu"}
 {
 }
 
@@ -68,8 +67,8 @@ IFACEMETHODIMP VkloudMenuExtention::Initialize(LPCITEMIDLIST idlFolder, LPDATAOB
     FORMATETC fe = { CF_HDROP, NULL, DVASPECT_CONTENT, -1, TYMED_HGLOBAL };
     STGMEDIUM stm;
 
-    // The pDataObj pointer contains the objects being acted upon. In this 
-    // example, we get an HDROP handle for enumerating the selected files and 
+    // The pDataObj pointer contains the objects being acted upon. In this
+    // example, we get an HDROP handle for enumerating the selected files and
     // folders.
     if (SUCCEEDED(dataObject->GetData(&fe, &stm)))
     {
@@ -77,9 +76,9 @@ IFACEMETHODIMP VkloudMenuExtention::Initialize(LPCITEMIDLIST idlFolder, LPDATAOB
         HDROP hDrop = static_cast<HDROP>(GlobalLock(stm.hGlobal));
         if (hDrop != NULL)
         {
-            // Determine how many files are involved in this operation. This 
-            // code sample displays the custom context menu item when only 
-            // one file is selected. 
+            // Determine how many files are involved in this operation. This
+            // code sample displays the custom context menu item when only
+            // one file is selected.
             UINT nFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
             if (nFiles == 1)
             {
@@ -108,7 +107,7 @@ IFACEMETHODIMP VkloudMenuExtention::Initialize(LPCITEMIDLIST idlFolder, LPDATAOB
             //    }
 
             //    // If we found any files we can work with, return S_OK.
-            //    if (selectedFiles.size() > 0) 
+            //    if (selectedFiles.size() > 0)
             //    {
             //        hr = S_OK;
             //    }
@@ -120,12 +119,13 @@ IFACEMETHODIMP VkloudMenuExtention::Initialize(LPCITEMIDLIST idlFolder, LPDATAOB
         ReleaseStgMedium(&stm);
     }
 
-    // If any value other than S_OK is returned from the method, the context 
+    // If any value other than S_OK is returned from the method, the context
     // menu item is not displayed.
     return hr;*/
 }
 
-IFACEMETHODIMP VkloudMenuExtention::QueryContextMenu(HMENU menu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast, UINT flags)
+IFACEMETHODIMP VkloudMenuExtention::QueryContextMenu(HMENU menu, UINT indexMenu, UINT idCmdFirst, UINT idCmdLast,
+                                                     UINT flags)
 {
     if (CMF_DEFAULTONLY & flags)
     {
@@ -136,20 +136,20 @@ IFACEMETHODIMP VkloudMenuExtention::QueryContextMenu(HMENU menu, UINT indexMenu,
     // Learn how to add sub-menu from:
     // http://www.codeproject.com/KB/shell/ctxextsubmenu.aspx
 
-    MENUITEMINFO mii = { sizeof(mii) };
+    MENUITEMINFO mii = {sizeof(mii)};
     mii.fMask = MIIM_STRING | MIIM_FTYPE | MIIM_ID | MIIM_STATE;
     mii.wID = idCmdFirst + IDM_DISPLAY;
     mii.fType = MFT_STRING;
     mii.dwTypeData = const_cast<PWSTR>(menuText);
     mii.fState = MFS_ENABLED;
-    //mii.hbmpItem = static_cast<HBITMAP>(m_hMenuBmp);
+    // mii.hbmpItem = static_cast<HBITMAP>(m_hMenuBmp);
     if (!InsertMenuItem(menu, indexMenu, TRUE, &mii))
     {
         return HRESULT_FROM_WIN32(GetLastError());
     }
 
     // Add a separator.
-    MENUITEMINFO sep = { sizeof(sep) };
+    MENUITEMINFO sep = {sizeof(sep)};
     sep.fMask = MIIM_TYPE;
     sep.fType = MFT_SEPARATOR;
     if (!InsertMenuItem(menu, indexMenu + 1, TRUE, &sep))
@@ -157,8 +157,8 @@ IFACEMETHODIMP VkloudMenuExtention::QueryContextMenu(HMENU menu, UINT indexMenu,
         return HRESULT_FROM_WIN32(GetLastError());
     }
 
-    // Return an HRESULT value with the severity set to SEVERITY_SUCCESS. 
-    // Set the code value to the offset of the largest command identifier 
+    // Return an HRESULT value with the severity set to SEVERITY_SUCCESS.
+    // Set the code value to the offset of the largest command identifier
     // that was assigned, plus one (1).
     return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(IDM_DISPLAY + 1));
 }
@@ -168,7 +168,8 @@ IFACEMETHODIMP VkloudMenuExtention::InvokeCommand(LPCMINVOKECOMMANDINFO info)
     return S_OK;
 }
 
-IFACEMETHODIMP VkloudMenuExtention::GetCommandString(UINT_PTR isCommand, UINT flags, UINT* reserved, LPSTR name, UINT cchMax)
+IFACEMETHODIMP VkloudMenuExtention::GetCommandString(UINT_PTR isCommand, UINT flags, UINT* reserved, LPSTR name,
+                                                     UINT cchMax)
 {
     return S_OK;
 }

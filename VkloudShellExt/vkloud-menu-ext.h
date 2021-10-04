@@ -2,13 +2,11 @@
 
 #include <ShObjIdl_core.h>
 
-
 class VkloudMenuExtention
     : public IShellExtInit
     , public IContextMenu
 {
 public:
-
     VkloudMenuExtention();
 
     IFACEMETHODIMP QueryInterface(REFIID riid, void** ppv) override;
@@ -22,7 +20,6 @@ public:
     IFACEMETHODIMP GetCommandString(UINT_PTR isCommand, UINT flags, UINT* reserved, LPSTR name, UINT cchMax) override;
 
 private:
-
     long refCounter;
     PCWSTR menuText;
 };

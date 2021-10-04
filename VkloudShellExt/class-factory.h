@@ -2,11 +2,9 @@
 
 #include <Unknwn.h>
 
-
 class ClassFactory : public IClassFactory
 {
 public:
-
     explicit ClassFactory();
     ~ClassFactory();
 
@@ -18,6 +16,5 @@ public:
     IFACEMETHODIMP LockServer(BOOL lock) override;
 
 private:
-
     long refCounter;
 };
