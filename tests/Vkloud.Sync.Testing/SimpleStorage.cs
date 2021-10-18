@@ -7,58 +7,53 @@ using Vkloud.Sync;
 
 namespace SyncTests
 {
-    sealed class SimpleStorage : IStorage
+    sealed class SimpleStorage : IFileStorage
     {
-        public event EventHandler<StorageEventArgs> Added;
-        //public event EventHandler<string> Changed;
-        public event EventHandler<StorageEventArgs> Removed;
+        public event EventHandler<FileStorageEventArgs> Added;
+        public event EventHandler<FileStorageEventArgs> Removed;
 
         public SimpleStorage(string name)
         {
             this.name = name;
-
-            /*items.Add(new SimpleItem(Guid.NewGuid()));
-            items.Add(new SimpleItem(Guid.NewGuid()));
-            items.Add(new SimpleItem(Guid.NewGuid()));
-            items.Add(new SimpleItem(Guid.NewGuid()));
-            items.Add(new SimpleItem(Guid.NewGuid()));
-            items.Add(new SimpleItem(Guid.NewGuid()));*/
         }
 
-        public IEnumerable<StorageItem> Items => items;
+        public IEnumerable<AbstractFile> Files => items.Values;
 
-        public async Task Add(StorageItem item)
+        public async Task Add(AbstractFile file)
         {
-            var content = await item.GetContentAsync();
+            using var content = await file.GetContentAsync();
             var st = new MemoryStream();
             await content.CopyToAsync(st);
-            var simpleItem = new SimpleItem(st.ToArray());
-            items.Add(simpleItem);
+            var simpleItem = new SimpleFile(st.ToArray(), file.Path);
+            items.Add(simpleItem.Path, simpleItem);
 
-            Added?.Invoke(this, new StorageEventArgs(this, simpleItem));
+            Added?.Invoke(this, new FileStorageEventArgs(this, simpleItem));
         }
 
-        public Task Remove(StorageItem item)
+        public Task Remove(AbstractFile file)
         {
-            var t = items.Find(i =>
-                        {
-                            if (item.Equals(i)) return true;
-                            return false;
-                        });
+            if (items.TryGetValue(file.Path, out var targetFile))
+            {
+                items.Remove(targetFile.Path);
+                Removed?.Invoke(this, new FileStorageEventArgs(this, targetFile));
 
-            items.Remove(t);
-
-            Removed?.Invoke(this, new StorageEventArgs(this, t));
+                return Task.CompletedTask;
+            }
 
             return Task.CompletedTask;
         }
 
-        public bool Contains(StorageItem item)
+        public bool Contains(AbstractFile file)
         {
-            return items.Contains(item as SimpleItem);
+            if (items.TryGetValue(file.Path, out var targetFile))
+            {
+                return file.Equals(targetFile);
+            }
+
+            return false;
         }
 
         private readonly string name;
-        private readonly List<SimpleItem> items = new();
+        private readonly Dictionary<string, AbstractFile> items = new();
     }
 }
