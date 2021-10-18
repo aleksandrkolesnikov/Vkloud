@@ -16,22 +16,6 @@ namespace SyncTests
 
         public override string Path { get; init; }
 
-        public override byte[] Hash
-        {
-            get
-            {
-                if (hash == null)
-                {
-                    using var sha256 = SHA256.Create();
-                    using var content = GetContentAsync().Result;
-
-                    hash = sha256.ComputeHash(content);
-                }
-
-                return hash;
-            }
-        }
-
         public override Task<Stream> GetContentAsync()
         {
             var stream = new MemoryStream(buffer, false);
@@ -40,7 +24,5 @@ namespace SyncTests
         }
 
         private readonly byte[] buffer;
-
-        private byte[] hash;
     }
 }

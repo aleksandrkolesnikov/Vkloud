@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 
@@ -10,7 +11,21 @@ namespace Vkloud.Sync
     {
         public abstract string Path { get; init; }
 
-        public abstract byte[] Hash { get; }
+        public virtual byte[] Hash
+        {
+            get
+            {
+                if (hash == null)
+                {
+                    using var md5 = MD5.Create();
+                    using var content = GetContentAsync().Result;
+
+                    hash = md5.ComputeHash(content);
+                }
+
+                return hash;
+            }
+        }
 
         public abstract Task<Stream> GetContentAsync();
 
@@ -38,5 +53,7 @@ namespace Vkloud.Sync
             // TODO: temporary return 0. I have the great idea for this method
             return 0;
         }
+
+        private byte[] hash;
     }
 }
