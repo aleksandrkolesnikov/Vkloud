@@ -50,7 +50,7 @@ namespace Vkloud.Sync
 
         public override int GetHashCode()
         {
-            // TODO: temporary return 0. I have the great idea for this method
+            // TODO: temporary return 0.
             return 0;
         }
 

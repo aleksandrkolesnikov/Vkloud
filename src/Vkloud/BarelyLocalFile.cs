@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
+using Vkloud.Sync;
+
 
 namespace Vkloud
 {
@@ -15,7 +17,7 @@ namespace Vkloud
 
         public override Task<Stream> GetContentAsync() => file.GetContentAsync();
 
-        public async Task<LocalFile> ToLocalFile()
+        /*public async Task<LocalFile> ToLocalFile()
         {
             using (var fileStream = File.OpenWrite(fullPath))
             using (var content = await file.GetContentAsync())
@@ -25,7 +27,7 @@ namespace Vkloud
 
             var localFile = new LocalFile(fullPath) { Path = file.Path };
             return localFile;
-        }
+        }*/
 
         private readonly AbstractFile file;
         private readonly string fullPath;

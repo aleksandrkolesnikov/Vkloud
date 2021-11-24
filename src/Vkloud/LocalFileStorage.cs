@@ -4,16 +4,14 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Vkloud.Sync;
-using System.Diagnostics;
 
 
 namespace Vkloud
 {
-    sealed class LocalFileStorage : IStorage
+    sealed class LocalFileStorage : IFileStorage
     {
-        public event EventHandler<StorageEventArgs> Added;
-        public event EventHandler<string> Changed;
-        public event EventHandler<StorageEventArgs> Removed;
+        public event EventHandler<FileStorageEventArgs> Added;
+        public event EventHandler<FileStorageEventArgs> Removed;
 
         public LocalFileStorage(string path)
         {
@@ -32,32 +30,30 @@ namespace Vkloud
                                     Path = fileInfo.FullName.Replace(baseDirInfo.FullName + Path.DirectorySeparatorChar, "")
                                 }));
 
-            files = new();
+            //files = new();
         }
 
-        public IEnumerable<StorageItem> Items => container.Files;
+        public IEnumerable<AbstractFile> Files => container.Files;
 
-        public async Task Add(StorageItem item)
+        public Task Add(AbstractFile file)
         {
-            if (item is AbstractFile file)
-            {
-                var subDirInfo = Directory.CreateDirectory(Path.Join(baseDirInfo.FullName, Path.GetDirectoryName(file.Path)));
-                var fullFileName = Path.Join(subDirInfo.FullName, Path.GetFileName(file.Path));
+            var subDirInfo = Directory.CreateDirectory(Path.Join(baseDirInfo.FullName, Path.GetDirectoryName(file.Path)));
+            var fullFileName = Path.Join(subDirInfo.FullName, Path.GetFileName(file.Path));
 
-                File.Create(fullFileName).Close();
-                var _file = new BarelyLocalFile(file, fullFileName);
-                files[_file.Path] = _file;
+            File.Create(fullFileName).Close();
+            var barelyFile = new BarelyLocalFile(file, fullFileName);
+            container.Add(barelyFile);
+            //files[barelyFile.Path] = barelyFile;
 
-                //Trace.WriteLine($"{file.Path} has been added");
-            }
+            return Task.CompletedTask;
         }
 
-        public bool Contains(StorageItem item)
+        public bool Contains(AbstractFile file)
         {
-            return container.Files.Contains(item);
+            return container.Files.Contains(file);
         }
 
-        public Task Remove(StorageItem item)
+        public Task Remove(AbstractFile file)
         {
             //File.Delete(Path.Join(baseDirInfo.FullName, item.Path));
 
@@ -72,7 +68,7 @@ namespace Vkloud
             if (IsFile(e.FullPath))
             {
                 //TODO: add new file to container
-                Added?.Invoke(this, new StorageEventArgs(this, new LocalFile(e.FullPath) { Path = e.Name }));
+                Added?.Invoke(this, new FileStorageEventArgs(this, new LocalFile(e.FullPath) { Path = e.Name }));
             }
         }
 
@@ -81,7 +77,7 @@ namespace Vkloud
             //TODO: deleting folder does not support
 
             var fake = container.CreateFake(e.FullPath.Replace(baseDirInfo.FullName + Path.DirectorySeparatorChar, ""));
-            Removed?.Invoke(this, new StorageEventArgs(this, fake));
+            Removed?.Invoke(this, new FileStorageEventArgs(this, fake));
         }
 
         private static bool IsFile(string fullPath) => !File.GetAttributes(fullPath).HasFlag(FileAttributes.Directory);
@@ -89,6 +85,6 @@ namespace Vkloud
         private readonly DirectoryInfo baseDirInfo;
         private readonly FileSystemWatcher watcher;
         private readonly LocalFileContainer container;
-        private readonly Dictionary<string, AbstractFile> files;
+        //private readonly Dictionary<string, AbstractFile> files;
     }
 }

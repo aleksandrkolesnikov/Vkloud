@@ -10,15 +10,14 @@ using System.Diagnostics;
 
 namespace Vkloud
 {
-    sealed class RemoteFileStorage : IStorage
+    sealed class RemoteFileStorage : IFileStorage
     {
-        public event EventHandler<StorageEventArgs> Added;
-        public event EventHandler<string> Changed;
-        public event EventHandler<StorageEventArgs> Removed;
+        public event EventHandler<FileStorageEventArgs> Added = delegate { };
+        public event EventHandler<FileStorageEventArgs> Removed = delegate { };
 
         public RemoteFileStorage(string login, string password)
         {
-            vkClient = new(login, password);
+            vkClient = Client.Create(login, password).Result;
             var documents = vkClient.GetDocumentsAsync().Result;
             files = new(documents
                         .Select(doc => new RemoteFile(doc))
@@ -27,50 +26,38 @@ namespace Vkloud
             Trace.WriteLine($"RemoteStorage has {files.Count} files");
         }
 
-        public IEnumerable<StorageItem> Items
+        public IEnumerable<AbstractFile> Files => files.Values;
+
+        public async Task Add(AbstractFile file)
         {
-            get => files.Values;
+            using var content = await file.GetContentAsync();
+            var memStream = new System.IO.MemoryStream();
+            await content.CopyToAsync(memStream);
+            var document = await vkClient.UploadDocumentAsync(file.Path.Replace(System.IO.Path.DirectorySeparatorChar, ':'), memStream.ToArray());
+            var remoteFile = new RemoteFile(document);
+            files[remoteFile.Path] = remoteFile;
+
+            Trace.WriteLine($"{document.Title} has been uploaded");
         }
 
-        public async Task Add(StorageItem item)
+        public bool Contains(AbstractFile file)
         {
-            if (item is AbstractFile file)
+            if (files.TryGetValue(file.Path, out var targetFile))
             {
-                using var content = await file.GetContentAsync();
-                var document = await vkClient.UploadDocumentAsync(file.Path.Replace(System.IO.Path.DirectorySeparatorChar, ':'), content);
-                var remoteFile = new RemoteFile(document);
-                files[remoteFile.Path] = remoteFile;
-
-                Trace.WriteLine($"{document.Title} has been uploaded");
-            }
-
-            //LOG
-        }
-
-        public bool Contains(StorageItem item)
-        {
-            if (item is AbstractFile file)
-            {
-                if (files.TryGetValue(file.Path, out var targetFile))
-                {
-                    return file.Equals(targetFile);
-                }
+                return file.Equals(targetFile);
             }
 
             return false;
         }
 
-        public async Task Remove(StorageItem item)
+        public async Task Remove(AbstractFile file)
         {
-            if (item is AbstractFile file)
+            if (files.TryGetValue(file.Path, out var targetFile))
             {
-                if (files.TryGetValue(file.Path, out var targetFile))
+                if (file.Equals(targetFile))
                 {
-                    if (file.Equals(targetFile))
-                    {
-                        await vkClient.RemoveDocumentAsync(targetFile.Document);
-                        files.Remove(targetFile.Path);
-                    }
+                    await vkClient.RemoveDocumentAsync(targetFile.Document);
+                    files.Remove(targetFile.Path);
                 }
             }
         }
